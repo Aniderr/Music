@@ -1,5 +1,7 @@
 package com.jackie.music.service;
 
+import java.io.IOException;
+
 import com.jackie.music.constant.MusicConstant;
 import com.lidroid.xutils.util.LogUtils;
 
@@ -41,11 +43,6 @@ public class PlayService extends Service{
 	@Override  
     public int onStartCommand(Intent intent, int flags, int startId) {  
 		
-	   
-		
-       if(mediaPlayer.isPlaying()) {
-            stop();  
-       }  
        path = intent.getStringExtra("url");          
        int msg = intent.getIntExtra("MSG", 0);  
        
@@ -90,9 +87,12 @@ public class PlayService extends Service{
      */  
     private void pause() {  
         if (mediaPlayer != null && mediaPlayer.isPlaying()) {  
-            mediaPlayer.pause();  
+            
+        	mediaPlayer.pause();  
             isPause = true;  
-        }  
+        }else{
+        	mediaPlayer.start();
+        }
     }  
     
     /** 
@@ -101,11 +101,12 @@ public class PlayService extends Service{
     private void stop(){  
         if(mediaPlayer != null) {  
             mediaPlayer.stop();  
-            try {  
+            
+           /* try {  
                 mediaPlayer.prepare(); // 在调用stop后如果需要再次通过start进行播放,需要之前调用prepare函数  
             } catch (Exception e) {  
                 e.printStackTrace();  
-            }  
+            }  */
         }  
     }  
     

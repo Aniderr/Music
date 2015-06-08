@@ -22,7 +22,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.jackie.music.SongSingleActivity"></activity>
+        <activity android:name="com.jackie.music.SongSingleActivity"
+            android:screenOrientation="portrait"></activity>
+        
+        <activity android:name="com.jackie.music.PlayerActivity"
+            android:screenOrientation="portrait"></activity>
         
         <service android:name="com.jackie.music.service.PlayService"></service>
     </application>

@@ -72,13 +72,18 @@ public class SongSingleActivity extends Activity{
 		//判断是否存在音乐信息
 		if(names != null){
 			
-			Intent intent = new Intent();
+			/*Intent intent = new Intent();
 			intent.putExtra("url",  getUrl(names.get(position)));         
             intent.putExtra("MSG", MusicConstant.PLAY_MSG);  
             intent.setClass(SongSingleActivity.this, PlayService.class);  
             startService(intent);       //启动服务  
+*/            
+            Intent intent2 = new Intent();
+            intent2.putExtra("url",  getUrl(names.get(position)));         
+            intent2.putExtra("MSG", MusicConstant.PLAY_MSG);  
+            intent2.setClass(this,PlayerActivity.class);
+            startActivity(intent2);
             
-			Toast.makeText(getApplicationContext(), getUrl(names.get(position)), 0).show();
 		}
 		
 	}
