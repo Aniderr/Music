@@ -1,22 +1,21 @@
 package com.jackie.music.constant;
 
-
 /**
  * 
  * ÏµÍ³³£Á¿
+ * 
  * @author jackie
- *
+ * 
  */
 public class MusicConstant {
 
-	//²¥·Å
+	// ²¥·Å
 	public static final int PLAY_MSG = 1;
-	
-	//ÔÝÍ£
+
+	// ÔÝÍ£
 	public static final int PAUSE_MSG = 2;
 
-	//Í£Ö¹
+	// Í£Ö¹
 	public static final int STOP_MSG = 0;
 
-	
 }

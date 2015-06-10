@@ -5,35 +5,36 @@ package com.jackie.music.entity;
 
 /**
  * 歌曲文件信息实体对象
+ * 
  * @author Jackie
- *
+ * 
  */
 public class MusicBean {
 
-	//歌曲的id
+	// 歌曲的id
 	private int _id;
-	
-	//歌曲名称
-	private String tilte ;
-	
-	//歌曲所属专辑
+
+	// 歌曲名称
+	private String tilte;
+
+	// 歌曲所属专辑
 	private String album;
-	
-	//歌手名称
+
+	// 歌手名称
 	private String artist;
-	
-	//歌曲文件路径
+
+	// 歌曲文件路径
 	private String url;
-	
-	//歌曲文件的名称，这里不是歌曲名
+
+	// 歌曲文件的名称，这里不是歌曲名
 	private String display_name;
-	
-	//歌曲发行日期
+
+	// 歌曲发行日期
 	private String year;
-	
-	//歌曲的总播放时长
+
+	// 歌曲的总播放时长
 	private int duration;
-	
+
 	private int size;
 
 	public int get_id() {
@@ -107,6 +108,5 @@ public class MusicBean {
 	public void setSize(int size) {
 		this.size = size;
 	}
-	
-	
+
 }

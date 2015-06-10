@@ -33,4 +33,9 @@
         android:text="@string/gon"
         android:layout_gravity="center_horizontal"/>
     
+    <SeekBar 
+        android:id="@+id/seekBar"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:padding="20dp"/>
 </LinearLayout>

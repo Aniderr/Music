@@ -24,7 +24,12 @@ import com.lidroid.xutils.view.annotation.ViewInject;
 import com.lidroid.xutils.view.annotation.event.OnItemClick;
 
 /**
- * @author jackie
+ * 
+ * Class description： ---- 歌曲列表页
+ * 
+ * @author Jackie
+ * 
+ *         创建日期：2015 / 2015年6月10日
  * 
  */
 
@@ -81,6 +86,7 @@ public class SongSingleActivity extends Activity {
 			Intent intent2 = new Intent();
 			intent2.putExtra("url", musicBeans.get(position).getUrl());
 			intent2.putExtra("MSG", MusicConstant.PLAY_MSG);
+			intent2.putExtra("duration", musicBeans.get(position).getDuration());
 			intent2.setClass(this, PlayerActivity.class);
 			startActivity(intent2);
 
@@ -88,7 +94,12 @@ public class SongSingleActivity extends Activity {
 
 	}
 
-	// 读取sdcard中的音乐文件信息
+	/**
+	 * 
+	 * Method description： ---- 扫描加载设备中的音乐文件信息 参数说明：
+	 * 
+	 * 返回类型：void
+	 */
 	public void loadMp3() {
 
 		// 创建一个内容提供对象
@@ -196,10 +207,14 @@ public class SongSingleActivity extends Activity {
 	}
 
 	/**
-	 * 判断此命名文件是否已经存在
+	 * 
+	 * Method description： ---- 判断此命名文件是否已经存在 参数说明：
 	 * 
 	 * @param displayName
+	 *            文件全称
 	 * @return
+	 * 
+	 *         返回类型：boolean
 	 */
 	public boolean isExits(String displayName) {
 

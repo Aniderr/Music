@@ -17,21 +17,22 @@ import com.jackie.music.entity.MusicBean;
 
 /**
  * ∏Ë«˙¡–±Ì  ≈‰∆˜
+ * 
  * @author Jackie
- *
+ * 
  */
 public class SongSingleAdapter extends BaseAdapter {
 
 	private List<MusicBean> list;
 	private Context context;
 	private LayoutInflater mInflater;
-	
-	public SongSingleAdapter(Context context,List<MusicBean> list) {
+
+	public SongSingleAdapter(Context context, List<MusicBean> list) {
 		this.context = context;
 		this.list = list;
 		this.mInflater = LayoutInflater.from(context);
 	}
-	
+
 	@Override
 	public int getCount() {
 		return list.size();
@@ -49,13 +50,13 @@ public class SongSingleAdapter extends BaseAdapter {
 
 	@Override
 	public View getView(int position, View view, ViewGroup parent) {
-		
+
 		view = mInflater.inflate(R.layout.song_single_item, null);
-		
+
 		TextView textView = (TextView) view.findViewById(R.id.single_item);
-		
+
 		textView.setText(list.get(position).getTilte());
-		
+
 		return view;
 	}
 
