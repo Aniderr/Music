@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.jackie.music;
+package com.jackie.music.entity;
 
 /**
  * 歌曲文件信息实体对象
