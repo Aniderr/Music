@@ -1,15 +1,13 @@
 package com.jackie.music.service;
 
-import java.io.IOException;
-
-import com.jackie.music.constant.MusicConstant;
-import com.lidroid.xutils.util.LogUtils;
-
 import android.app.Service;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnPreparedListener;
 import android.os.IBinder;
+
+import com.jackie.music.constant.MusicConstant;
+import com.lidroid.xutils.util.LogUtils;
 
 /**
  * 

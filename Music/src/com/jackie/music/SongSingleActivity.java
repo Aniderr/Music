@@ -11,11 +11,9 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.example.music.R;
 import com.jackie.music.constant.MusicConstant;
-import com.jackie.music.service.PlayService;
 import com.lidroid.xutils.ViewUtils;
 import com.lidroid.xutils.view.annotation.ContentView;
 import com.lidroid.xutils.view.annotation.ViewInject;
@@ -52,14 +50,6 @@ public class SongSingleActivity extends Activity{
 		
 		listView.setAdapter(adapter);
 		
-		/*listView.setOnItemClickListener(new OnItemClickListener() {
-
-			@Override
-			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
-					long arg3) {
-				
-			}
-		});*/
 	}
 	
 	
