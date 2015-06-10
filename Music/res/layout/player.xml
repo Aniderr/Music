@@ -32,4 +32,5 @@
         android:layout_height="wrap_content"
         android:text="@string/gon"
         android:layout_gravity="center_horizontal"/>
+    
 </LinearLayout>

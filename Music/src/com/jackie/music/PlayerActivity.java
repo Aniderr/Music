@@ -2,9 +2,12 @@ package com.jackie.music;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.SeekBar;
+import android.widget.SeekBar.OnSeekBarChangeListener;
 
 import com.example.music.R;
 import com.jackie.music.constant.MusicConstant;
@@ -49,6 +52,10 @@ public class PlayerActivity extends Activity{
 	}
 	
 	
+	/**
+	 * Í£Ö¹²¥·Å
+	 * @param view
+	 */
 	@OnClick(R.id.stop)
 	public void stop(View view){
 		
@@ -59,6 +66,10 @@ public class PlayerActivity extends Activity{
 		
 	}
 	
+	/**
+	 * ÔÝÍ£²¥·Å
+	 * @param view
+	 */
 	@OnClick(R.id.pause)
 	public void pause(View view){
 		
@@ -68,6 +79,11 @@ public class PlayerActivity extends Activity{
 		startService(intent);
 	}
 	
+	
+	/**
+	 * ¼ÌÐø²¥·Å
+	 * @param view
+	 */
 	@OnClick(R.id.gon)
 	public void continues(View view){
 		

@@ -12,12 +12,12 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.example.music.R;
 import com.jackie.music.constant.MusicConstant;
+import com.jackie.music.dao.SongSingleAdapter;
+import com.jackie.music.entity.MusicBean;
 import com.lidroid.xutils.ViewUtils;
 import com.lidroid.xutils.view.annotation.ContentView;
 import com.lidroid.xutils.view.annotation.ViewInject;
@@ -52,9 +52,9 @@ public class SongSingleActivity extends Activity {
 
 		loadMp3();
 
-		ArrayAdapter<MusicBean> adapter = new ArrayAdapter<MusicBean>(
-				getApplicationContext(), R.layout.song_single_item,
-				R.id.single_item, musicBeans);
+		// 自定义适配器显示歌曲列表
+		SongSingleAdapter adapter = new SongSingleAdapter(
+				getApplicationContext(), musicBeans);
 
 		listView.setAdapter(adapter);
 
@@ -102,9 +102,6 @@ public class SongSingleActivity extends Activity {
 				MediaStore.Audio.Media.TITLE, MediaStore.Audio.Media.DATA };
 
 		// 执行查询操作
-		// Cursor cursor = mResolver.query(
-		// uri, projetion, null, null,null);
-
 		cursor = mResolver.query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
 				null, null, null, null);
 
@@ -116,44 +113,69 @@ public class SongSingleActivity extends Activity {
 
 				MusicBean musicBean = new MusicBean();
 
-				String name = cursor.getString(cursor
-						.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE));
+				int size = cursor.getInt(cursor
+						.getColumnIndexOrThrow(MediaStore.Audio.Media.SIZE));
 
-				// 判断文件后缀
-				if (name.endsWith("mp3")) {
+				if (size > 500) {
 
-					// 去掉文件后缀名
-					name = name.substring(0, name.lastIndexOf("."));
+					String name = cursor
+							.getString(cursor
+									.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE));
+
+					// 判断文件后缀
+
+					String display_name = cursor
+							.getString(cursor
+									.getColumnIndexOrThrow(MediaStore.Audio.Media.DISPLAY_NAME));
+
+					// 判断是否已经存在
+					if (isExits(display_name)) {
+
+						if (display_name.endsWith("mp3")) {
+
+							// 去掉文件后缀名
+							// name = name.substring(0, name.lastIndexOf("."));
+
+							musicBean.setTilte(name);
+
+							musicBean
+									.set_id(cursor.getInt(cursor
+											.getColumnIndexOrThrow(MediaStore.Audio.Media._ID)));
+
+							musicBean
+									.setUrl(cursor.getString(cursor
+											.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA)));
+
+							musicBean
+									.setAlbum(cursor.getString(cursor
+											.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM)));
+
+							musicBean
+									.setArtist(cursor.getString(cursor
+											.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST)));
+
+							musicBean
+									.setDisplay_name(cursor.getString(cursor
+											.getColumnIndexOrThrow(MediaStore.Audio.Media.DISPLAY_NAME)));
+
+							musicBean
+									.setYear(cursor.getString(cursor
+											.getColumnIndexOrThrow(MediaStore.Audio.Media.YEAR)));
+
+							musicBean
+									.setDuration(cursor.getInt(cursor
+											.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION)));
+
+							musicBean
+									.setSize(cursor.getInt(cursor
+											.getColumnIndexOrThrow(MediaStore.Audio.Media.SIZE)));
+
+							musicBeans.add(musicBean);
+						}
+					}
+
 				}
-				musicBean.setTilte(name);
 
-				musicBean.set_id(cursor.getInt(cursor
-						.getColumnIndexOrThrow(MediaStore.Audio.Media._ID)));
-
-				musicBean.setUrl(cursor.getString(cursor
-						.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA)));
-
-				musicBean.setAlbum(cursor.getString(cursor
-						.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM)));
-
-				musicBean.setArtist(cursor.getString(cursor
-						.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST)));
-
-				musicBean
-						.setDisplay_name(cursor.getString(cursor
-								.getColumnIndexOrThrow(MediaStore.Audio.Media.DISPLAY_NAME)));
-
-				musicBean.setYear(cursor.getString(cursor
-						.getColumnIndexOrThrow(MediaStore.Audio.Media.YEAR)));
-
-				musicBean
-						.setDuration(cursor.getInt(cursor
-								.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION)));
-
-				musicBean.setSize(cursor.getInt(cursor
-						.getColumnIndexOrThrow(MediaStore.Audio.Media.SIZE)));
-
-				musicBeans.add(musicBean);
 			}
 		}
 
@@ -171,5 +193,27 @@ public class SongSingleActivity extends Activity {
 	public String getUrl(String name) {
 
 		return PATH + "/" + name + ".mp3";
+	}
+
+	/**
+	 * 判断此命名文件是否已经存在
+	 * 
+	 * @param displayName
+	 * @return
+	 */
+	public boolean isExits(String displayName) {
+
+		boolean b = true;
+
+		if (musicBeans.size() > 0) {
+
+			for (MusicBean bean : musicBeans) {
+
+				if (displayName.endsWith(bean.getDisplay_name())) {
+					b = false;
+				}
+			}
+		}
+		return b;
 	}
 }

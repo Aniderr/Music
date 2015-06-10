@@ -3,9 +3,17 @@
  */
 package com.jackie.music.dao;
 
+import java.util.List;
+
+import android.content.Context;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.TextView;
+
+import com.example.music.R;
+import com.jackie.music.entity.MusicBean;
 
 /**
  * ∏Ë«˙¡–±Ì  ≈‰∆˜
@@ -14,40 +22,41 @@ import android.widget.BaseAdapter;
  */
 public class SongSingleAdapter extends BaseAdapter {
 
-	/* (non-Javadoc)
-	 * @see android.widget.Adapter#getCount()
-	 */
+	private List<MusicBean> list;
+	private Context context;
+	private LayoutInflater mInflater;
+	
+	public SongSingleAdapter(Context context,List<MusicBean> list) {
+		this.context = context;
+		this.list = list;
+		this.mInflater = LayoutInflater.from(context);
+	}
+	
 	@Override
 	public int getCount() {
-		// TODO Auto-generated method stub
-		return 0;
+		return list.size();
 	}
 
-	/* (non-Javadoc)
-	 * @see android.widget.Adapter#getItem(int)
-	 */
 	@Override
 	public Object getItem(int position) {
-		// TODO Auto-generated method stub
-		return null;
+		return list.get(position);
 	}
 
-	/* (non-Javadoc)
-	 * @see android.widget.Adapter#getItemId(int)
-	 */
 	@Override
 	public long getItemId(int position) {
-		// TODO Auto-generated method stub
-		return 0;
+		return position;
 	}
 
-	/* (non-Javadoc)
-	 * @see android.widget.Adapter#getView(int, android.view.View, android.view.ViewGroup)
-	 */
 	@Override
-	public View getView(int position, View convertView, ViewGroup parent) {
-		// TODO Auto-generated method stub
-		return null;
+	public View getView(int position, View view, ViewGroup parent) {
+		
+		view = mInflater.inflate(R.layout.song_single_item, null);
+		
+		TextView textView = (TextView) view.findViewById(R.id.single_item);
+		
+		textView.setText(list.get(position).getTilte());
+		
+		return view;
 	}
 
 }
