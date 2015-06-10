@@ -1,12 +1,15 @@
 package com.jackie.music;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -82,7 +85,41 @@ public class SongSingleActivity extends Activity{
 	//读取sdcard中的音乐文件信息
 	public void loadMp3(){
 		
-		File file = new File(PATH);
+		//创建一个内容提供对象
+		ContentResolver mResolver = getContentResolver();
+		
+		//设置查询连接地址
+		Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+		
+		//设置查询参数
+		String projetion[] = {MediaStore.Audio.Media._ID,MediaStore.Audio.Media.TITLE,MediaStore.Audio.Media.DATA};
+		
+		//执行查询操作
+		Cursor cursor = mResolver.query(
+                uri, projetion, null, null,null);
+		
+		//判断是否存在查询结果，如果存在循环显示出结果信息
+		if(cursor.getCount() > 0){
+			
+			cursor.moveToFirst();
+			while(cursor.moveToNext()){
+				
+				String name = cursor.getString(1);
+				
+				//判断文件后缀
+				if(name.endsWith("mp3")){
+					
+					//去掉文件后缀名
+					name =name.substring(0,name.lastIndexOf("."));
+				}
+				
+				names.add(name);
+			}
+		}
+		
+		/**
+		 * 这里存储根据指定路径查询文件方式，以便之后使用
+		 * File file = new File(PATH);
 		//获取指定路径下的所有文件信息
 		String[] fileNames = file.list();
 		//对数组信息进行迭代找出mp3信息
@@ -94,7 +131,7 @@ public class SongSingleActivity extends Activity{
 				name =name.substring(0,name.lastIndexOf("."));
 				names.add(name);
 			}
-		}
+		}*/
 	}
 	
 	//组装音乐路径
