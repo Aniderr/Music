@@ -29,6 +29,7 @@ public class PlayService extends Service {
 	// 暂停状态
 	private boolean isPause = false;
 
+	private int position = 0;
 	/*
 	 * 服务绑定事件
 	 */
@@ -43,11 +44,13 @@ public class PlayService extends Service {
 
 		path = intent.getStringExtra("url");
 		int Msg = intent.getIntExtra("MSG", 0);
-
+		
 		if (Msg == MusicConstant.PLAY_MSG) {
 
+			position = intent.getIntExtra("position", 0);
+			
 			LogUtils.i("start");
-			play(0);
+			play(position);
 
 		} else if (Msg == MusicConstant.PAUSE_MSG) {
 
@@ -73,6 +76,12 @@ public class PlayService extends Service {
 			mediaPlayer.reset();// 把各项参数恢复到初始状态
 			mediaPlayer.setDataSource(path);
 			mediaPlayer.prepare(); // 进行缓冲
+			
+			//根据进度条的拖拽情况播放不同进度的音乐信息
+			if(position > 0){
+				mediaPlayer.seekTo(position);
+			}
+			
 			mediaPlayer.setOnPreparedListener(new PreparedListener(position));// 注册一个监听器
 		} catch (Exception e) {
 			e.printStackTrace();

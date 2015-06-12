@@ -3,6 +3,7 @@ package com.jackie.music;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
 import android.widget.Button;
 import android.widget.SeekBar;
@@ -13,6 +14,7 @@ import com.example.music.R;
 import com.jackie.music.constant.MusicConstant;
 import com.jackie.music.service.PlayService;
 import com.lidroid.xutils.ViewUtils;
+import com.lidroid.xutils.util.LogUtils;
 import com.lidroid.xutils.view.annotation.ContentView;
 import com.lidroid.xutils.view.annotation.ViewInject;
 import com.lidroid.xutils.view.annotation.event.OnClick;
@@ -46,6 +48,8 @@ public class PlayerActivity extends Activity {
 	private SeekBar seekBar;
 	
 	private Intent intent;
+	
+	private Handler handler;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -60,12 +64,13 @@ public class PlayerActivity extends Activity {
 		//根据歌曲的时长设置seekbar的长度
 		seekBar.setMax(intent.getIntExtra("duration", 100));
 		
-		Toast.makeText(getApplicationContext(), seekBar.getMax()+"", 0).show();
 		//滑动进度条改变播放进度
 		seekBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
 			
 			@Override
-			public void onStopTrackingTouch(SeekBar arg0) {
+			public void onStopTrackingTouch(SeekBar seekbar) {
+				
+				Toast.makeText(getApplicationContext(), seekbar.getProgress()+"", 0).show();
 				
 			}
 			
@@ -75,13 +80,31 @@ public class PlayerActivity extends Activity {
 			}
 			
 			@Override
-			public void onProgressChanged(SeekBar arg0, int arg1, boolean arg2) {
+			public void onProgressChanged(SeekBar arg0, int position, boolean arg2) {
 				
-//				Toast.makeText(getApplicationContext(), "arg1" + arg1, 0).show();
+				intent.putExtra("MSG", MusicConstant.PLAY_MSG);
+				intent.putExtra("position", position);
+				intent.setClass(PlayerActivity.this, PlayService.class);
+				startService(intent);
 			}
 		});
+		
+		thread.start();
 	}
+	
+	Thread thread = new Thread(new Runnable() {
+		
+		@Override
+		public void run() {
+			
+			LogUtils.i("ok");
+			LogUtils.i(""+seekBar.getProgress());
+			
+			seekBar.setProgress(seekBar.getProgress() + 1);
+		}
+	});
 
+	
 	/**
 	 * 
 	 * Method description：
@@ -94,11 +117,13 @@ public class PlayerActivity extends Activity {
 	@OnClick(R.id.stop)
 	public void stop(View view) {
 
+		seekBar.setProgress(0);
+		
 		Intent intent = new Intent();
 		intent.putExtra("MSG", MusicConstant.STOP_MSG);
 		intent.setClass(PlayerActivity.this, PlayService.class);
 		startService(intent);
-
+		
 	}
 
 	/**
