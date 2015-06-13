@@ -29,7 +29,10 @@ public class PlayService extends Service {
 	// 暂停状态
 	private boolean isPause = false;
 
+	private boolean isDisabled = true;
+
 	private int position = 0;
+
 	/*
 	 * 服务绑定事件
 	 */
@@ -40,17 +43,50 @@ public class PlayService extends Service {
 	}
 
 	@Override
+	public void onCreate() {
+		super.onCreate();
+
+		new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+
+				while (isDisabled) {
+					if (!isPause) {
+
+						try {
+							Thread.sleep(1000);
+							++position;
+
+							// 发送广播
+							Intent intent = new Intent();
+							intent.putExtra("count", position);
+							intent.setAction("com.ljq.activity.CountService");
+							sendBroadcast(intent);
+
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+					}
+				}
+			}
+		}).start();
+
+	}
+
+	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 
 		path = intent.getStringExtra("url");
 		int Msg = intent.getIntExtra("MSG", 0);
-		
+
 		if (Msg == MusicConstant.PLAY_MSG) {
 
 			position = intent.getIntExtra("position", 0);
-			
-			LogUtils.i("start");
+
 			play(position);
+
+			isPause = false;
 
 		} else if (Msg == MusicConstant.PAUSE_MSG) {
 
@@ -61,6 +97,8 @@ public class PlayService extends Service {
 
 			LogUtils.i("stop");
 			stop();
+
+			isPause = true;
 
 		}
 		return super.onStartCommand(intent, flags, startId);
@@ -76,13 +114,14 @@ public class PlayService extends Service {
 			mediaPlayer.reset();// 把各项参数恢复到初始状态
 			mediaPlayer.setDataSource(path);
 			mediaPlayer.prepare(); // 进行缓冲
-			
-			//根据进度条的拖拽情况播放不同进度的音乐信息
-			if(position > 0){
+
+			// 根据进度条的拖拽情况播放不同进度的音乐信息
+			if (position > 0) {
 				mediaPlayer.seekTo(position);
 			}
-			
+
 			mediaPlayer.setOnPreparedListener(new PreparedListener(position));// 注册一个监听器
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -95,9 +134,12 @@ public class PlayService extends Service {
 		if (mediaPlayer != null && mediaPlayer.isPlaying()) {
 
 			mediaPlayer.pause();
+
 			isPause = true;
+
 		} else {
 			mediaPlayer.start();
+			isPause = false;
 		}
 	}
 
@@ -121,6 +163,8 @@ public class PlayService extends Service {
 		if (mediaPlayer != null) {
 			mediaPlayer.stop();
 			mediaPlayer.release();
+			isPause = true;
+			isDisabled = false;
 		}
 	}
 
@@ -144,4 +188,5 @@ public class PlayService extends Service {
 			}
 		}
 	}
+
 }
