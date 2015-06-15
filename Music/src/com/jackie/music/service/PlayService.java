@@ -117,10 +117,11 @@ public class PlayService extends Service {
 
 			// 根据进度条的拖拽情况播放不同进度的音乐信息
 			if (position > 0) {
-				mediaPlayer.seekTo(position);
+				mediaPlayer.seekTo(position * 1000);
 			}
 
-			mediaPlayer.setOnPreparedListener(new PreparedListener(position));// 注册一个监听器
+			mediaPlayer.setOnPreparedListener(new PreparedListener(
+					position * 1000));// 注册一个监听器
 
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -10,11 +10,14 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
+import android.widget.TextView;
 
 import com.example.music.R;
 import com.jackie.music.constant.MusicConstant;
 import com.jackie.music.service.PlayService;
+import com.jackie.music.utils.FormatTimes;
 import com.lidroid.xutils.ViewUtils;
+import com.lidroid.xutils.util.LogUtils;
 import com.lidroid.xutils.view.annotation.ContentView;
 import com.lidroid.xutils.view.annotation.ViewInject;
 import com.lidroid.xutils.view.annotation.event.OnClick;
@@ -46,12 +49,20 @@ public class PlayerActivity extends Activity {
 
 	@ViewInject(R.id.seekBar)
 	private SeekBar seekBar;
+	
+	@ViewInject(R.id.current)
+	private TextView current;
+	
+	@ViewInject(R.id.total)
+	private TextView total;
 
 	private Intent intent;
 
 	private MyReceiver receiver;
 
 	private boolean isTouch = false;
+	
+	private boolean isStop = false;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -60,11 +71,17 @@ public class PlayerActivity extends Activity {
 
 		intent = getIntent();
 
+		isStop = false;
+		
 		intent.setClass(PlayerActivity.this, PlayService.class);
 		startService(intent);
 
 		// 根据歌曲的时长设置seekbar的长度
-		seekBar.setMax(intent.getIntExtra("duration", 100));
+		seekBar.setMax(intent.getIntExtra("duration", 100) / 1000);
+		
+		double totals = intent.getIntExtra("duration", 100); 
+		
+		total.setText(FormatTimes.formatTotal(intent.getIntExtra("duration", 100)));
 
 		// 注册广播接收器
 		receiver = new MyReceiver();
@@ -94,7 +111,8 @@ public class PlayerActivity extends Activity {
 					boolean arg2) {
 
 				if (isTouch) {
-
+					
+					isStop = false;
 					intent.putExtra("MSG", MusicConstant.PLAY_MSG);
 					intent.putExtra("position", position);
 
@@ -117,7 +135,10 @@ public class PlayerActivity extends Activity {
 	public void stop(View view) {
 
 		seekBar.setProgress(0);
+		current.setText("00:00");
 
+		isStop = true;
+		
 		intent.putExtra("MSG", MusicConstant.STOP_MSG);
 		intent.setClass(PlayerActivity.this, PlayService.class);
 		startService(intent);
@@ -135,6 +156,8 @@ public class PlayerActivity extends Activity {
 	@OnClick(R.id.pause)
 	public void pause(View view) {
 
+		isStop = false;
+		
 		intent.putExtra("MSG", MusicConstant.PAUSE_MSG);
 		intent.setClass(PlayerActivity.this, PlayService.class);
 		startService(intent);
@@ -151,6 +174,8 @@ public class PlayerActivity extends Activity {
 	@OnClick(R.id.gon)
 	public void continues(View view) {
 
+		isStop = false;
+		
 		intent.putExtra("MSG", MusicConstant.PAUSE_MSG);
 		intent.setClass(PlayerActivity.this, PlayService.class);
 		startService(intent);
@@ -166,6 +191,8 @@ public class PlayerActivity extends Activity {
 	@OnClick(R.id.play)
 	public void play(View view) {
 
+		isStop = false;
+		
 		intent.putExtra("MSG", MusicConstant.PLAY_MSG);
 		intent.setClass(PlayerActivity.this, PlayService.class);
 		startService(intent);
@@ -185,7 +212,16 @@ public class PlayerActivity extends Activity {
 			int count = bundle.getInt("count");
 			isTouch = false;
 			seekBar.setProgress(count);
-
+			
+			current.setText(FormatTimes.formatCurrent(count));
+			
+			//由于广播接收时间在与操作按钮之后，所以在点击停止时就给出一个状态来控制当前时间归于零
+			if(isStop){
+				
+				current.setText("00:00");
+			}
+			
+			LogUtils.i(seekBar.getProgress()+"*");
 		}
 	}
 
