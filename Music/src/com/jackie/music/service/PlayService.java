@@ -3,6 +3,7 @@ package com.jackie.music.service;
 import android.app.Service;
 import android.content.Intent;
 import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnPreparedListener;
 import android.os.IBinder;
 
@@ -24,7 +25,10 @@ public class PlayService extends Service {
 	private MediaPlayer mediaPlayer = new MediaPlayer();
 
 	// 音乐文件路径
-	private String path;
+	private String path1 = "";
+	private String path2 = "";
+
+	private int Msg;
 
 	// 暂停状态
 	private boolean isPause = false;
@@ -32,6 +36,8 @@ public class PlayService extends Service {
 	private boolean isDisabled = true;
 
 	private int position = 0;
+
+	private int totals = 0;
 
 	/*
 	 * 服务绑定事件
@@ -58,11 +64,16 @@ public class PlayService extends Service {
 							Thread.sleep(1000);
 							++position;
 
-							// 发送广播
-							Intent intent = new Intent();
-							intent.putExtra("count", position);
-							intent.setAction("com.ljq.activity.CountService");
-							sendBroadcast(intent);
+							// 防止当前时长超过总时长
+							if (totals == 0 || position < totals
+									|| position == totals) {
+
+								// 发送广播
+								Intent intent = new Intent();
+								intent.putExtra("count", position);
+								intent.setAction("com.ljq.activity.CountService");
+								sendBroadcast(intent);
+							}
 
 						} catch (InterruptedException e) {
 							e.printStackTrace();
@@ -72,23 +83,39 @@ public class PlayService extends Service {
 			}
 		}).start();
 
+		mediaPlayer.setOnCompletionListener(new OnCompletionListener() {
+
+			@Override
+			public void onCompletion(MediaPlayer mPlayer) {
+
+				isPause = true;
+			}
+		});
 	}
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 
-		path = intent.getStringExtra("url");
-		int Msg = intent.getIntExtra("MSG", 0);
+		path2 = intent.getStringExtra("url");
+		Msg = intent.getIntExtra("MSG", 0);
+		totals = intent.getIntExtra("totals", 0);
 
-		if (Msg == MusicConstant.PLAY_MSG) {
+		// 如果点击需要播放的歌曲是当前正在播放的歌曲时不进行从头播放，即对现在的播放不造成任何影响
+		if (!path2.equals(path1)) {
+			path1 = path2;
 
-			position = intent.getIntExtra("position", 0);
+			if (Msg == MusicConstant.PLAY_MSG) {
 
-			play(position);
+				position = intent.getIntExtra("position", 0);
 
-			isPause = false;
+				play(position);
 
-		} else if (Msg == MusicConstant.PAUSE_MSG) {
+				isPause = false;
+
+			}
+		}
+
+		if (Msg == MusicConstant.PAUSE_MSG) {
 
 			LogUtils.i("pause");
 			pause();
@@ -112,7 +139,7 @@ public class PlayService extends Service {
 	private void play(int position) {
 		try {
 			mediaPlayer.reset();// 把各项参数恢复到初始状态
-			mediaPlayer.setDataSource(path);
+			mediaPlayer.setDataSource(path1);
 			mediaPlayer.prepare(); // 进行缓冲
 
 			// 根据进度条的拖拽情况播放不同进度的音乐信息

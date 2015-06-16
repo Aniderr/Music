@@ -87,6 +87,8 @@ public class SongSingleActivity extends Activity {
 			intent2.putExtra("url", musicBeans.get(position).getUrl());
 			intent2.putExtra("MSG", MusicConstant.PLAY_MSG);
 			intent2.putExtra("duration", musicBeans.get(position).getDuration());
+			intent2.putExtra("title", musicBeans.get(position).getTilte());
+			intent2.putExtra("author", musicBeans.get(position).getArtist());
 			intent2.setClass(this, PlayerActivity.class);
 			startActivity(intent2);
 

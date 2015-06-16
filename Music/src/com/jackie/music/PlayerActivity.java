@@ -1,6 +1,9 @@
 package com.jackie.music;
 
 import android.app.Activity;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -17,7 +20,6 @@ import com.jackie.music.constant.MusicConstant;
 import com.jackie.music.service.PlayService;
 import com.jackie.music.utils.FormatTimes;
 import com.lidroid.xutils.ViewUtils;
-import com.lidroid.xutils.util.LogUtils;
 import com.lidroid.xutils.view.annotation.ContentView;
 import com.lidroid.xutils.view.annotation.ViewInject;
 import com.lidroid.xutils.view.annotation.event.OnClick;
@@ -49,10 +51,10 @@ public class PlayerActivity extends Activity {
 
 	@ViewInject(R.id.seekBar)
 	private SeekBar seekBar;
-	
+
 	@ViewInject(R.id.current)
 	private TextView current;
-	
+
 	@ViewInject(R.id.total)
 	private TextView total;
 
@@ -61,9 +63,10 @@ public class PlayerActivity extends Activity {
 	private MyReceiver receiver;
 
 	private boolean isTouch = false;
-	
+
 	private boolean isStop = false;
 
+	@SuppressWarnings("deprecation")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -72,16 +75,29 @@ public class PlayerActivity extends Activity {
 		intent = getIntent();
 
 		isStop = false;
-		
-		intent.setClass(PlayerActivity.this, PlayService.class);
-		startService(intent);
+
+		NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+		Notification notification = new Notification(R.drawable.ic_launcher,
+				null, System.currentTimeMillis());// 第一个参数为图标,第二个参数为短暂提示标题,第三个为通知时间
+		intent.setClass(this, SongSingleActivity.class);
+		PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
+				intent, 0);// 当点击消息时就会向系统发送openintent意图
+		notification.setLatestEventInfo(this, intent.getStringExtra("title"),
+				intent.getStringExtra("author"), contentIntent);
+		mNotificationManager.notify(0, notification);// 第一个参数为自定义的通知唯一标识
 
 		// 根据歌曲的时长设置seekbar的长度
 		seekBar.setMax(intent.getIntExtra("duration", 100) / 1000);
-		
-		double totals = intent.getIntExtra("duration", 100); 
-		
-		total.setText(FormatTimes.formatTotal(intent.getIntExtra("duration", 100)));
+
+		int totals = intent.getIntExtra("duration", 100);
+
+		// 用于service控制播放时长与总时长的关系
+		intent.putExtra("totals", totals / 1000);
+
+		intent.setClass(PlayerActivity.this, PlayService.class);
+		startService(intent);
+
+		total.setText(FormatTimes.formatTotal(totals));
 
 		// 注册广播接收器
 		receiver = new MyReceiver();
@@ -111,7 +127,7 @@ public class PlayerActivity extends Activity {
 					boolean arg2) {
 
 				if (isTouch) {
-					
+
 					isStop = false;
 					intent.putExtra("MSG", MusicConstant.PLAY_MSG);
 					intent.putExtra("position", position);
@@ -138,7 +154,7 @@ public class PlayerActivity extends Activity {
 		current.setText("00:00");
 
 		isStop = true;
-		
+
 		intent.putExtra("MSG", MusicConstant.STOP_MSG);
 		intent.setClass(PlayerActivity.this, PlayService.class);
 		startService(intent);
@@ -157,7 +173,7 @@ public class PlayerActivity extends Activity {
 	public void pause(View view) {
 
 		isStop = false;
-		
+
 		intent.putExtra("MSG", MusicConstant.PAUSE_MSG);
 		intent.setClass(PlayerActivity.this, PlayService.class);
 		startService(intent);
@@ -175,7 +191,7 @@ public class PlayerActivity extends Activity {
 	public void continues(View view) {
 
 		isStop = false;
-		
+
 		intent.putExtra("MSG", MusicConstant.PAUSE_MSG);
 		intent.setClass(PlayerActivity.this, PlayService.class);
 		startService(intent);
@@ -192,7 +208,7 @@ public class PlayerActivity extends Activity {
 	public void play(View view) {
 
 		isStop = false;
-		
+
 		intent.putExtra("MSG", MusicConstant.PLAY_MSG);
 		intent.setClass(PlayerActivity.this, PlayService.class);
 		startService(intent);
@@ -212,16 +228,14 @@ public class PlayerActivity extends Activity {
 			int count = bundle.getInt("count");
 			isTouch = false;
 			seekBar.setProgress(count);
-			
+
 			current.setText(FormatTimes.formatCurrent(count));
-			
-			//由于广播接收时间在与操作按钮之后，所以在点击停止时就给出一个状态来控制当前时间归于零
-			if(isStop){
-				
+
+			// 由于广播接收时间在与操作按钮之后，所以在点击停止时就给出一个状态来控制当前时间归于零
+			if (isStop) {
+
 				current.setText("00:00");
 			}
-			
-			LogUtils.i(seekBar.getProgress()+"*");
 		}
 	}
 
