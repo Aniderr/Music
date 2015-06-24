@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+    <dimen name="music_play_header">30dip</dimen>
+    <dimen name="music_play_title_size">24sp</dimen>
+    <dimen name="music_play_icon_margintop">30dp</dimen>
+    <dimen name="music_play_lyric_width">300dp</dimen>
+    <dimen name="music_play_lyric_height">215dp</dimen>
+    <dimen name="music_play_lyric_margintop">20dp</dimen>
+    <dimen name="music_play_lyric_size">18sp</dimen>
+    <dimen name="music_play_lyric_linespacing">12dp</dimen>
+    <dimen name="music_play_controller_height">30dp</dimen>
+    <dimen name="music_play_controller_process_width">300dp</dimen>
+    <dimen name="music_play_controller_btn_padding">30dp</dimen>
+</resources>

@@ -10,7 +10,9 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
@@ -38,7 +40,7 @@ import com.lidroid.xutils.view.annotation.event.OnClick;
 public class PlayerActivity extends Activity {
 
 	@ViewInject(R.id.pause)
-	private Button pause;
+	private ImageView pause;
 
 	@ViewInject(R.id.stop)
 	private Button stop;
@@ -49,7 +51,7 @@ public class PlayerActivity extends Activity {
 	@ViewInject(R.id.gon)
 	private Button gon;
 
-	@ViewInject(R.id.seekBar)
+	@ViewInject(R.id.music_play_controller_process)
 	private SeekBar seekBar;
 
 	@ViewInject(R.id.current)
@@ -57,6 +59,9 @@ public class PlayerActivity extends Activity {
 
 	@ViewInject(R.id.total)
 	private TextView total;
+
+	@ViewInject(R.id.music_title)
+	private TextView music_title;
 
 	private Intent intent;
 
@@ -66,38 +71,24 @@ public class PlayerActivity extends Activity {
 
 	private boolean isStop = false;
 
-	@SuppressWarnings("deprecation")
+	private boolean isPlay = true;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+
 		ViewUtils.inject(this);
 
 		intent = getIntent();
 
 		isStop = false;
 
-		NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-		Notification notification = new Notification(R.drawable.ic_launcher,
-				null, System.currentTimeMillis());// 第一个参数为图标,第二个参数为短暂提示标题,第三个为通知时间
-		intent.setClass(this, SongSingleActivity.class);
-		PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
-				intent, 0);// 当点击消息时就会向系统发送openintent意图
-		notification.setLatestEventInfo(this, intent.getStringExtra("title"),
-				intent.getStringExtra("author"), contentIntent);
-		mNotificationManager.notify(0, notification);// 第一个参数为自定义的通知唯一标识
+		init(intent);
 
-		// 根据歌曲的时长设置seekbar的长度
-		seekBar.setMax(intent.getIntExtra("duration", 100) / 1000);
-
-		int totals = intent.getIntExtra("duration", 100);
-
-		// 用于service控制播放时长与总时长的关系
-		intent.putExtra("totals", totals / 1000);
-
-		intent.setClass(PlayerActivity.this, PlayService.class);
-		startService(intent);
-
-		total.setText(FormatTimes.formatTotal(totals));
+		// 显示通知栏
+		showNotifiaction();
 
 		// 注册广播接收器
 		receiver = new MyReceiver();
@@ -140,6 +131,46 @@ public class PlayerActivity extends Activity {
 	}
 
 	/**
+	 * 显示通知栏
+	 */
+	@SuppressWarnings("deprecation")
+	public void showNotifiaction() {
+		NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+		Notification notification = new Notification(R.drawable.ic_launcher,
+				null, System.currentTimeMillis());// 第一个参数为图标,第二个参数为短暂提示标题,第三个为通知时间
+
+		intent.setClass(this, SongSingleActivity.class);
+		PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
+				intent, 0);// 当点击消息时就会向系统发送openintent意图
+
+		notification.setLatestEventInfo(this, intent.getStringExtra("title"),
+				intent.getStringExtra("author"), contentIntent);
+
+		mNotificationManager.notify(0, notification);// 第一个参数为自定义的通知唯一标识
+	}
+
+	/**
+	 * 初始化
+	 */
+	private void init(Intent intent) {
+
+		music_title.setText(intent.getStringExtra("title"));
+
+		// 根据歌曲的时长设置seekbar的长度
+		seekBar.setMax(intent.getIntExtra("duration", 100) / 1000);
+
+		int totals = intent.getIntExtra("duration", 100);
+
+		// 用于service控制播放时长与总时长的关系
+		intent.putExtra("totals", totals / 1000);
+
+		intent.setClass(PlayerActivity.this, PlayService.class);
+		startService(intent);
+
+		total.setText(FormatTimes.formatTotal(totals));
+	}
+
+	/**
 	 * 
 	 * Method description： ---- 停止播放 参数说明：
 	 * 
@@ -173,6 +204,14 @@ public class PlayerActivity extends Activity {
 	public void pause(View view) {
 
 		isStop = false;
+
+		if (isPlay) {
+			isPlay = !isPlay;
+			pause.setImageResource(R.drawable.play);
+		} else {
+			isPlay = !isPlay;
+			pause.setImageResource(R.drawable.pause);
+		}
 
 		intent.putExtra("MSG", MusicConstant.PAUSE_MSG);
 		intent.setClass(PlayerActivity.this, PlayService.class);
@@ -218,7 +257,7 @@ public class PlayerActivity extends Activity {
 	/**
 	 * 获取广播数据
 	 * 
-	 * @author jiqinlin
+	 * @author
 	 * 
 	 */
 	public class MyReceiver extends BroadcastReceiver {

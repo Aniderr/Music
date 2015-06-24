@@ -143,7 +143,7 @@ public class PlayService extends Service {
 			mediaPlayer.prepare(); // 进行缓冲
 
 			// 根据进度条的拖拽情况播放不同进度的音乐信息
-			if (position > 0) {
+			if (position > 0 && (position * 1000) < totals) {
 				mediaPlayer.seekTo(position * 1000);
 			}
 
